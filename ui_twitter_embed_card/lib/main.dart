@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
-void main() {
+import 'persentations/screens/twitter_embed_screen.dart';
+import 'values/values.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SvgAsset.preloadSVGs();
+
   runApp(const MyApp());
 }
 
@@ -10,12 +16,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const Scaffold(
+        body: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Center(
+            child: SizedBox(
+              width: 600,
+              child: TwitterEmbedCard(),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
