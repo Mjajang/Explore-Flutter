@@ -113,6 +113,7 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
             isLikeHover = true;
           },
         ),
+        const SpaceWidth(24),
         actionTweet(
           icon: SvgAsset.comment,
           title: 'Reply',
@@ -132,6 +133,7 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
             isReplyHover = true;
           },
         ),
+        const SpaceWidth(24),
         actionTweet(
           icon: SvgAsset.link,
           title: 'Copy link',
