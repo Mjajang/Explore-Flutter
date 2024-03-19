@@ -42,7 +42,7 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
         children: [
           buildUser(
             displayName: widget.data.displayName,
-            username: widget.data.displayName,
+            username: widget.data.username,
             linkProfile: widget.data.linkProfile,
           ),
           const SpaceHeight(16),
@@ -349,7 +349,7 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
                         verticalOffset: 12,
                         margin: const EdgeInsets.only(left: 94),
                         child: Text(
-                          '@$username',
+                          username,
                           style: const TextStyle(color: Colors.black54),
                         ),
                       ),
