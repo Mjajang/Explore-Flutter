@@ -19,6 +19,9 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
   bool isAvatarHover = false;
   bool isInfoHover = false;
   bool isTimelineHover = false;
+  bool isLikeHover = false;
+  bool isReplyHover = false;
+  bool isCopyLinkHover = false;
   bool isNameHover = false;
   bool isUsernameHover = false;
   bool isFollowHover = false;
@@ -66,9 +69,61 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
   Widget buildActionTweet() {
     return Row(
       children: [
-        actionTweet(icon: SvgAsset.heartRed, title: Strings.likesNumber),
-        actionTweet(icon: SvgAsset.comment, title: 'Reply'),
-        actionTweet(icon: SvgAsset.link, title: 'Copy link'),
+        actionTweet(
+          icon: SvgAsset.heartRed,
+          title: Strings.likesNumber,
+          message: 'Like this post',
+          isHovered: isLikeHover,
+          textColor: Colors.redAccent,
+          backgroundColor: Colors.redAccent,
+          onTap: () {
+            js.context.callMethod('open', [Strings.linkLike]);
+          },
+          onHover: (value) {
+            setState(() {
+              isLikeHover = value;
+            });
+          },
+          onTriggered: () {
+            isLikeHover = true;
+          },
+        ),
+        actionTweet(
+          icon: SvgAsset.comment,
+          title: 'Reply',
+          message: 'Reply to this post',
+          isHovered: isReplyHover,
+          textColor: Colors.blueAccent,
+          backgroundColor: Colors.blueAccent,
+          onTap: () {
+            js.context.callMethod('open', [Strings.linkReply]);
+          },
+          onHover: (value) {
+            setState(() {
+              isReplyHover = value;
+            });
+          },
+          onTriggered: () {
+            isReplyHover = true;
+          },
+        ),
+        actionTweet(
+          icon: SvgAsset.link,
+          title: 'Copy link',
+          message: 'Share this post',
+          isHovered: isCopyLinkHover,
+          textColor: Colors.greenAccent,
+          backgroundColor: Colors.greenAccent,
+          onTap: () {},
+          onHover: (value) {
+            setState(() {
+              isCopyLinkHover = value;
+            });
+          },
+          onTriggered: () {
+            isCopyLinkHover = true;
+          },
+        ),
       ],
     );
   }
