@@ -1,15 +1,22 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:js' as js;
 
 import 'package:flutter/material.dart';
+
 import 'package:ui_twitter_embed_card/persentations/widgets/ink_well.dart';
 import 'package:ui_twitter_embed_card/persentations/widgets/tool_tip.dart';
 
+import '../../data/tweet_data.dart';
 import '../../values/values.dart';
 import '../widgets/action_tweet.dart';
 
 class TwitterEmbedCard extends StatefulWidget {
-  const TwitterEmbedCard({super.key});
+  const TwitterEmbedCard({
+    Key? key,
+    required this.data,
+  }) : super(key: key);
+  final TweetData data;
 
   @override
   State<TwitterEmbedCard> createState() => _TwitterEmbedCardState();
@@ -29,55 +36,73 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          minWidth: 623,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            buildUser(),
-            const SpaceHeight(16),
-            buildTweet(),
-            const SpaceHeight(20),
-            buildBanner(),
-            buildTimelineTweet(),
-            const Divider(),
-            buildActionTweet(),
-            const SpaceHeight(10),
-            SizedBox(
-              height: 33,
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {},
-                child: const Text(
-                  'Read ${Strings.repliesNumber} replies',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            )
-          ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          buildUser(
+            displayName: widget.data.displayName,
+            username: widget.data.displayName,
+            linkProfile: widget.data.linkProfile,
+          ),
+          const SpaceHeight(16),
+          buildTweet(body: widget.data.body),
+          buildBanner(bannerImage: widget.data.image),
+          const SpaceHeight(8.0),
+          buildMetaDataTweet(
+            linkProfile: widget.data.linkProfile,
+            linkInfo: widget.data.linkInfo,
+            time: widget.data.time,
+            date: widget.data.date,
+          ),
+          const Divider(),
+          buildActionTweet(
+            likesCount: widget.data.likesCount.toString(),
+            linkLike: widget.data.linkLike,
+            linkReply: widget.data.linkReply,
+          ),
+          const SpaceHeight(10),
+          buildTweetReadRepliesButton(
+            repliesCount: widget.data.repliesCount.toString(),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget buildTweetReadRepliesButton({required String repliesCount}) {
+    return SizedBox(
+      height: 33,
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: () {},
+        child: Text(
+          'Read $repliesCount replies',
+          style: const TextStyle(
+            color: Colors.blue,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
   }
 
-  Widget buildActionTweet() {
+  Widget buildActionTweet({
+    required String likesCount,
+    required String linkLike,
+    required String linkReply,
+  }) {
     return Row(
       children: [
         actionTweet(
           icon: SvgAsset.heartRed,
-          title: Strings.likesNumber,
+          title: likesCount,
           message: 'Like this post',
           isHovered: isLikeHover,
           textColor: Colors.redAccent,
           backgroundColor: Colors.redAccent,
           onTap: () {
-            js.context.callMethod('open', [Strings.linkLike]);
+            js.context.callMethod('open', [linkLike]);
           },
           onHover: (value) {
             setState(() {
@@ -96,7 +121,7 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
           textColor: Colors.blueAccent,
           backgroundColor: Colors.blueAccent,
           onTap: () {
-            js.context.callMethod('open', [Strings.linkReply]);
+            js.context.callMethod('open', [linkReply]);
           },
           onHover: (value) {
             setState(() {
@@ -128,90 +153,99 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
     );
   }
 
-  Widget buildTimelineTweet() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              ReusableInkWell(
-                onTap: () {
-                  js.context.callMethod('open', [Strings.linkProfile]);
+  Widget buildMetaDataTweet({
+    required String linkProfile,
+    required String linkInfo,
+    required String time,
+    required String date,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            ReusableInkWell(
+              onTap: () {
+                js.context.callMethod('open', [linkProfile]);
+              },
+              onHover: (value) {
+                setState(() {
+                  isTimelineHover = value;
+                });
+              },
+              child: ReusableTooltip(
+                message: "$time · $date",
+                verticalOffset: 8,
+                onTriggered: () {
+                  isTimelineHover = true;
                 },
-                onHover: (value) {
-                  setState(() {
-                    isTimelineHover = value;
-                  });
-                },
-                child: ReusableTooltip(
-                  message: "${Strings.dateHour} · ${Strings.date}",
-                  verticalOffset: 8,
-                  onTriggered: () {
-                    isTimelineHover = true;
-                  },
-                  child: Text(
-                    "${Strings.dateHour} · ${Strings.date}",
-                    style: TextStyle(
-                      color: Colors.black54,
-                      decoration: isTimelineHover
-                          ? TextDecoration.underline
-                          : TextDecoration.none,
-                    ),
+                child: Text(
+                  "$time · $date",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    decoration: isTimelineHover
+                        ? TextDecoration.underline
+                        : TextDecoration.none,
                   ),
                 ),
               ),
-            ],
-          ),
-          ReusableInkWell(
-            onTap: () {
-              js.context.callMethod('open', [Strings.linkInfo]);
-            },
-            onHover: (value) {
-              setState(() {
-                isInfoHover = value;
-              });
-            },
-            child: Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isInfoHover
-                    ? Colors.blue.withOpacity(0.25)
-                    : Colors.transparent,
-              ),
-              child: const SvgIcon(
-                asset: SvgAsset.info,
-                height: 20,
-              ),
+            ),
+          ],
+        ),
+        ReusableInkWell(
+          onTap: () {
+            js.context.callMethod('open', [linkInfo]);
+          },
+          onHover: (value) {
+            setState(() {
+              isInfoHover = value;
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isInfoHover
+                  ? Colors.blue.withOpacity(0.25)
+                  : Colors.transparent,
+            ),
+            child: const SvgIcon(
+              asset: SvgAsset.info,
+              height: 20,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget buildBanner() {
+  Widget buildBanner({required String bannerImage}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Image.asset(Images.banner),
+      child: Image.asset(bannerImage),
     );
   }
 
-  Widget buildTweet() {
+  Widget buildTweet({required String body}) {
     return Padding(
       padding: const EdgeInsets.only(right: 20.0),
       child: RichText(
-        text: const TextSpan(
-          text: Strings.tweet,
-          style: TextStyle(fontSize: 18),
+        text: TextSpan(
+          text: body,
+          style: const TextStyle(
+            fontSize: 18,
+            height: 1.25,
+          ),
         ),
       ),
     );
   }
 
-  Widget buildUser() {
+  Widget buildUser({
+    required String displayName,
+    required String username,
+    required String linkProfile,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -219,7 +253,7 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
           children: [
             ReusableInkWell(
               onTap: () {
-                js.context.callMethod('open', [Strings.linkProfile]);
+                js.context.callMethod('open', [linkProfile]);
               },
               onHover: (value) {
                 setState(() {
@@ -262,7 +296,7 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
                   children: [
                     ReusableInkWell(
                       onTap: () {
-                        js.context.callMethod('open', [Strings.linkProfile]);
+                        js.context.callMethod('open', [linkProfile]);
                       },
                       onHover: (value) {
                         setState(() {
@@ -276,7 +310,7 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
                         },
                         margin: const EdgeInsets.only(left: 30),
                         child: Text(
-                          Strings.name,
+                          displayName,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -300,7 +334,7 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
                   children: [
                     ReusableInkWell(
                       onTap: () {
-                        js.context.callMethod('open', [Strings.linkProfile]);
+                        js.context.callMethod('open', [linkProfile]);
                       },
                       onHover: (value) {
                         setState(() {
@@ -314,9 +348,9 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
                         },
                         verticalOffset: 12,
                         margin: const EdgeInsets.only(left: 94),
-                        child: const Text(
-                          '@${Strings.username}',
-                          style: TextStyle(color: Colors.black54),
+                        child: Text(
+                          '@$username',
+                          style: const TextStyle(color: Colors.black54),
                         ),
                       ),
                     ),
@@ -326,7 +360,7 @@ class _TwitterEmbedCardState extends State<TwitterEmbedCard> {
                     ),
                     ReusableInkWell(
                       onTap: () {
-                        js.context.callMethod('open', [Strings.linkProfile]);
+                        js.context.callMethod('open', [linkProfile]);
                       },
                       onHover: (value) {
                         setState(() {

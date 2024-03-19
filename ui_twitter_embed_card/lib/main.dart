@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ui_twitter_embed_card/data/tweet_data.dart';
 
 import 'persentations/screens/twitter_embed_screen.dart';
 import 'values/values.dart';
@@ -21,13 +22,13 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Scaffold(
+      home: Scaffold(
         body: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Center(
             child: SizedBox(
               width: 600,
-              child: TwitterEmbedCard(),
+              child: TwitterEmbedCard(data: tweetData),
             ),
           ),
         ),
