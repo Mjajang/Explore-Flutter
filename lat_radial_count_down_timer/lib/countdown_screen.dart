@@ -1,7 +1,8 @@
-import 'dart:async';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 class CountdownAndRestart extends StatefulWidget {
   const CountdownAndRestart({super.key});
@@ -14,46 +15,38 @@ class CountdownAndRestartState extends State<CountdownAndRestart>
     with SingleTickerProviderStateMixin {
   static const maxWidth = 300.0;
   static const initialValue = 10;
-  int seconds = initialValue;
-  late Timer timer;
-  late AnimationController controller;
+  Duration _elapsed = Duration.zero;
+
+  int get _remainingTime => max(0, initialValue - _elapsed.inSeconds);
+  double get _countdownProgress =>
+      _elapsed.inMilliseconds / (1000 * initialValue.toDouble());
+  late final Ticker _ticker;
 
   void restartTimer() {
-    timer.cancel();
-    controller.reset();
-    setState(() {
-      seconds = initialValue;
-    });
-    controller.forward();
-    startTimer();
+    _ticker.stop();
+    _ticker.start();
   }
 
   void startTimer() {
-    timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (seconds > 0) {
-        setState(() {
-          seconds--;
-        });
-      } else {
-        timer.cancel();
+    _ticker = createTicker((elapsed) {
+      setState(() => _elapsed = elapsed);
+      if (_elapsed.inSeconds >= initialValue) {
+        _ticker.stop();
       }
     });
+
+    _ticker.start();
   }
 
   @override
   void initState() {
     super.initState();
     startTimer();
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: initialValue),
-    )..forward();
   }
 
   @override
   void dispose() {
-    timer.cancel();
-    controller.dispose();
+    _ticker.dispose();
     super.dispose();
   }
 
@@ -63,27 +56,9 @@ class CountdownAndRestartState extends State<CountdownAndRestart>
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SizedBox(
-          height: 300,
-          width: 300,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              AnimatedBuilder(
-                  animation: controller,
-                  builder: (context, child) {
-                    return Transform.rotate(
-                      angle: -2 * pi * controller.value,
-                      child: CircularProgressIndicator(
-                        value: controller.value,
-                        strokeWidth: 23,
-                        backgroundColor: Colors.deepPurple.shade600,
-                      ),
-                    );
-                  }),
-              buildTime(context),
-            ],
-          ),
+        CountDownRenderer(
+          progress: _countdownProgress,
+          remainingTime: _remainingTime,
         ),
         const SizedBox(height: 32),
         ElevatedButton(
@@ -97,17 +72,98 @@ class CountdownAndRestartState extends State<CountdownAndRestart>
       ],
     );
   }
+}
 
-  Widget buildTime(BuildContext context) {
-    return Center(
-      child: Text(
-        "$seconds",
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 100,
-          color: Colors.deepPurple,
-        ),
+class CountDownRenderer extends StatelessWidget {
+  const CountDownRenderer({
+    Key? key,
+    required this.progress,
+    required this.remainingTime,
+  }) : super(key: key);
+  final double progress;
+  final int remainingTime;
+
+  final color = Colors.deepPurple;
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: Stack(
+        children: [
+          Center(
+            child: RingWithoutCustomPainter(
+              progress: progress,
+              foregroundColor: color.shade700,
+              backgroundColor: color.shade400,
+            ),
+          ),
+          Center(
+            child: RemainingTimeText(
+              remaining: remainingTime,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
+  }
+}
+
+class RemainingTimeText extends StatelessWidget {
+  const RemainingTimeText({
+    Key? key,
+    required this.remaining,
+    required this.color,
+  }) : super(key: key);
+  final int remaining;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final width = constraints.maxWidth;
+      return Text(
+        remaining.toString(),
+        style: TextStyle(
+          fontSize: width / 3,
+          color: color,
+        ),
+      );
+    });
+  }
+}
+
+class RingWithoutCustomPainter extends StatelessWidget {
+  const RingWithoutCustomPainter({
+    Key? key,
+    required this.progress,
+    required this.foregroundColor,
+    required this.backgroundColor,
+  }) : super(key: key);
+  final double progress;
+  final Color foregroundColor;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final strokeWidth = constraints.maxWidth / 15.0;
+      return AspectRatio(
+        aspectRatio: 1.0,
+        child: Padding(
+          padding: EdgeInsets.all(strokeWidth / 2.0),
+          child: Transform.rotate(
+            angle: -2 * pi * progress,
+            child: CircularProgressIndicator(
+              value: progress,
+              strokeWidth: strokeWidth,
+              valueColor: AlwaysStoppedAnimation<Color>(backgroundColor),
+              backgroundColor: foregroundColor,
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
