@@ -1,16 +1,7 @@
-# lat_radial_count_down_timer
+# Latihan Radial Countdown Timer
 
-A new Flutter project.
+A new Flutter project Radial Countdown Timer - [Flutter UI Challenge](https://pro.codewithandrea.com/).
 
-## Getting Started
+## Result App
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+https://github.com/Mjajang/Explore-Flutter/assets/79832998/6d8d8d1a-78e2-4f52-aede-8639665e672a
