@@ -91,12 +91,17 @@ class CountDownRenderer extends StatelessWidget {
       aspectRatio: 1.0,
       child: Stack(
         children: [
+          // * can be swapped with RingWithCustomPainter
           Center(
-            child: RingWithoutCustomPainter(
+            child: RingWithCustomPainter(
               progress: progress,
               foregroundColor: color.shade700,
               backgroundColor: color.shade400,
-            ),
+            ), /* RingWithoutCustomPainter(
+              progress: progress,
+              foregroundColor: color.shade700,
+              backgroundColor: color.shade400,
+            ), */
           ),
           Center(
             child: RemainingTimeText(
@@ -166,4 +171,72 @@ class RingWithoutCustomPainter extends StatelessWidget {
       );
     });
   }
+}
+
+class RingWithCustomPainter extends StatelessWidget {
+  const RingWithCustomPainter({
+    Key? key,
+    required this.progress,
+    required this.foregroundColor,
+    required this.backgroundColor,
+  }) : super(key: key);
+  final double progress;
+  final Color foregroundColor;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: CustomPaint(
+        painter: RingPainter(
+          progress: progress,
+          foregroundColor: foregroundColor,
+          backgroundColor: backgroundColor,
+        ),
+      ),
+    );
+  }
+}
+
+class RingPainter extends CustomPainter {
+  RingPainter({
+    required this.progress,
+    required this.foregroundColor,
+    required this.backgroundColor,
+  });
+  final double progress;
+  final Color foregroundColor;
+  final Color backgroundColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final strokeWidth = size.width / 15.0;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width - strokeWidth) / 2;
+
+    final backgroundPaint = Paint()
+      ..isAntiAlias = true
+      ..strokeWidth = strokeWidth
+      ..color = foregroundColor
+      ..style = PaintingStyle.stroke;
+    canvas.drawCircle(center, radius, backgroundPaint);
+
+    final foregroundPaint = Paint()
+      ..isAntiAlias = true
+      ..strokeWidth = strokeWidth
+      ..color = backgroundColor
+      ..style = PaintingStyle.stroke;
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -pi / 2,
+      -2 * pi * progress,
+      false,
+      foregroundPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant RingPainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }
