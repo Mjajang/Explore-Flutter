@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -87,88 +89,172 @@ class PushableButton extends StatefulWidget {
     this.onPressed,
   });
 
+  /// child widget (normally a Text or Icon)
   final Widget? child;
+
+  /// Color of the top layer
+  /// The color of the bottom layer is derived by decreasing the luminosity by 0.15
   final HSLColor hslColor;
+
+  /// height of the top layer
   final double height;
+
+  /// elevation or "gap" between the top and bottom layer
   final double elevation;
+
+  /// An optional shadow to make the button look better
+  /// This is added to the bottom layer only
   final BoxShadow? shadow;
+
+  /// button pressed callback
   final VoidCallback? onPressed;
 
   @override
   State<PushableButton> createState() => _PushableButtonState();
 }
 
-class _PushableButtonState extends State<PushableButton> {
-  double? position;
-  double scaleFactor = 1.0;
+class _PushableButtonState extends State<PushableButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animationController;
+  static const animationDuration = Duration(milliseconds: 50);
+  bool _isDragInProgress = false;
+  Offset _gestureLocation = Offset.zero;
+
+  @override
+  void initState() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: animationDuration,
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    _gestureLocation = details.localPosition;
+    _animationController.forward();
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    Future.delayed(animationDuration, () {
+      _animationController.reverse();
+    });
+    widget.onPressed?.call();
+  }
+
+  void _handleTapCancel() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (!_isDragInProgress && mounted) {
+        _animationController.reverse();
+      }
+    });
+  }
+
+  void _handleDragStart(DragStartDetails details) {
+    _gestureLocation = details.localPosition;
+    _isDragInProgress = true;
+    _animationController.forward();
+  }
+
+  void _handleDragEnd(Size buttonSize) {
+    if (_isDragInProgress) {
+      _isDragInProgress = false;
+      _animationController.reverse();
+    }
+
+    if (_gestureLocation.dx >= 0 &&
+        _gestureLocation.dx < buttonSize.width &&
+        _gestureLocation.dy >= 0 &&
+        _gestureLocation.dy < buttonSize.height) {
+      widget.onPressed?.call();
+    }
+  }
+
+  void _handleDragCancel() {
+    if (_isDragInProgress) {
+      _isDragInProgress = false;
+      _animationController.reverse();
+    }
+  }
+
+  void _handleDragUpdate(DragUpdateDetails details) {
+    _gestureLocation = details.localPosition;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapUp: (_) {
-        setState(() {
-          position = widget.elevation;
-          scaleFactor = 1.0;
-        });
-      },
-      onTapDown: (_) {
-        setState(() {
-          position = 0;
-          scaleFactor = 1.1;
-        });
+    final totalHeight = widget.height + widget.elevation;
 
-        widget.onPressed?.call();
-      },
-      onTapCancel: () {
-        setState(() {
-          position = widget.elevation;
-          scaleFactor = 1.0;
-        });
-      },
-      child: SizedBox(
-        height: 66,
-        child: Stack(
-          children: [
-            Positioned(
-              bottom: 0,
-              child: Container(
-                height: widget.height,
-                width: 300,
-                decoration: BoxDecoration(
-                  color: widget.hslColor
-                      .withLightness(widget.hslColor.lightness - 0.15)
-                      .toColor(),
-                  borderRadius: BorderRadius.circular(50),
-                  boxShadow: [widget.shadow ?? const BoxShadow()],
-                ),
-              ),
-            ),
-            AnimatedPositioned(
-              curve: Curves.easeIn,
-              bottom: position,
-              duration: const Duration(milliseconds: 70),
-              child: Container(
-                height: widget.height,
-                width: 300,
-                decoration: BoxDecoration(
-                  color: widget.hslColor.toColor(),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Transform.scale(
-                  scale: scaleFactor,
-                  child: SizedBox(
-                    height: widget.height * scaleFactor,
-                    width: 300 * scaleFactor,
-                    child: Center(
-                      child: widget.child,
+    return SizedBox(
+      height: totalHeight,
+      child: LayoutBuilder(builder: (context, constraints) {
+        final buttonSize = Size(constraints.maxWidth, constraints.maxHeight);
+
+        return GestureDetector(
+          onTapDown: _handleTapDown,
+          onTapUp: _handleTapUp,
+          onTapCancel: _handleTapCancel,
+          onHorizontalDragStart: (_) => _handleDragEnd(buttonSize),
+          onHorizontalDragCancel: _handleDragCancel,
+          onHorizontalDragUpdate: _handleDragUpdate,
+          onVerticalDragStart: _handleDragStart,
+          onVerticalDragEnd: (_) => _handleDragEnd(buttonSize),
+          onVerticalDragCancel: _handleDragCancel,
+          onVerticalDragUpdate: _handleDragUpdate,
+          child: AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              final scale = 1.0 + (_animationController.value * 0.1);
+              final top = _animationController.value * widget.elevation;
+              final hslColor = widget.hslColor;
+              final bottomHslColor =
+                  hslColor.withLightness(hslColor.lightness - 0.15);
+
+              return Stack(
+                children: [
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: totalHeight - top,
+                      decoration: BoxDecoration(
+                        color: bottomHslColor.toColor(),
+                        borderRadius: BorderRadius.circular(widget.height / 2),
+                        boxShadow:
+                            widget.shadow != null ? [widget.shadow!] : [],
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: top,
+                    child: Container(
+                      height: widget.height,
+                      decoration: ShapeDecoration(
+                        color: hslColor.toColor(),
+                        shape: const StadiumBorder(),
+                      ),
+                      child: Transform.scale(
+                        scale: scale,
+                        child: Center(
+                          child: widget.child,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      }),
     );
   }
 }
