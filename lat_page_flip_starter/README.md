@@ -1,16 +1,7 @@
-# lat_page_flip_starter
+# Latihan Page Flip Starter
 
-A new Flutter project.
+A new Flutter project Page Flip Starter Starter - [Flutter UI Challenge](https://pro.codewithandrea.com/).
 
-## Getting Started
+## Result App
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+https://github.com/Mjajang/Explore-Flutter/assets/79832998/ce7b6ed0-3e22-4661-a822-162c2ed39eef
