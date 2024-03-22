@@ -1,5 +1,7 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import 'package:ui_covid19_dashboard_starter/data/data_point.dart';
 
 class Dashboard extends StatelessWidget {
@@ -13,59 +15,69 @@ class Dashboard extends StatelessWidget {
       51245,
       7452340,
     ];
-    final List<DataPoint> dataPoints = [
-      DataPoint.casesTotal,
-      DataPoint.casesAcitve,
-      DataPoint.deaths,
-      DataPoint.recovered,
-    ];
 
-    return ListView.builder(
-      itemCount: dataPoints.length,
-      itemBuilder: (context, index) {
-        final formattedValue = NumberFormat('#,##0').format(values[index]);
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Card(
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        dataPoints[index].name,
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          color: dataPoints[index].color,
-                        ),
-                      ),
-                      Image.asset(
-                        dataPoints[index].assetPath,
-                        color: dataPoints[index].color,
-                        height: 50,
-                        width: 50,
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Text(
-                    formattedValue,
-                    style: TextStyle(
-                      fontSize: 26.0,
-                      color: dataPoints[index].color,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    return ListView(
+      children: [
+        for (final dataPoint in DataPoint.values)
+          DataPointCard(
+            dataPoint: dataPoint,
+            value: values[dataPoint.index],
           ),
-        );
-      },
+      ],
+    );
+  }
+}
+
+class DataPointCard extends StatelessWidget {
+  const DataPointCard({
+    super.key,
+    required this.dataPoint,
+    required this.value,
+  });
+  final DataPoint dataPoint;
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                dataPoint.name,
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall!
+                    .copyWith(color: dataPoint.color),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    dataPoint.assetPath,
+                    color: dataPoint.color,
+                    height: 48,
+                  ),
+                  Text(
+                    NumberFormat('#,###,###,###').format(value),
+                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                          color: dataPoint.color,
+                          fontWeight: FontWeight.w500,
+                        ),
+                  )
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
