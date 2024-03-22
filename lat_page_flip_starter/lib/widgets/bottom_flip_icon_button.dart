@@ -14,7 +14,7 @@ class BottomFlipIconButton extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
-          onPressed: () {},
+          onPressed: onFlip,
           icon: const Icon(Icons.flip),
         ),
       ],

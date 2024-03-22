@@ -42,7 +42,9 @@ class LightHomePage extends StatelessWidget {
                 height: 300,
               ),
               const Spacer(),
-              const BottomFlipIconButton(),
+              BottomFlipIconButton(
+                onFlip: onFlip,
+              ),
             ],
           ),
         ),
