@@ -1,16 +1,8 @@
-# ui_covid19_dashboard_starter
+# UI Covid19 Dashboard Starter
 
-A new Flutter project.
+A new Flutter project Slicing UI Covid19 Dashboard Starter - [Flutter UI Challenge](https://pro.codewithandrea.com/).
 
-## Getting Started
+## Result App
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![Screenshot 2024-03-22 105021](https://github.com/Mjajang/Explore-Flutter/assets/79832998/0a6e7c4f-e60d-4a00-8cb3-ab4f1ba291ad)
+![Screenshot 2024-03-22 105101](https://github.com/Mjajang/Explore-Flutter/assets/79832998/4cbf09db-8b7e-44b0-a3b4-44e806ac29f3)
