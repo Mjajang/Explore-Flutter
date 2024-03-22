@@ -42,6 +42,7 @@ class DataPointCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Card(
+        // color: Colors.blue.shade900, // Change the color of the card ligth variant
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Column(
