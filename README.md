@@ -14,6 +14,7 @@ Latest at the top
 
 | ID | APP                                  | About  | Link  | Code  |
 | -- | ------------------------------------ |------| ------ | ------ | 
+| 7  | Akademie Link                    |  submissions from the class "Belajar Membuat Aplikasi Flutter untuk Pemula" learning path multiplatform app from dicoding, in the scholarship event held by IDCamp 2023 | [Link](https://github.com/Mjajang/akademie-link) | LAT |
 | 6  | Binary2Decimal                    | Binary to Decimal Beginner Project [App Ideas](https://github.com/florinpop17/app-ideas/tree/master) | [Link](https://github.com/Mjajang/Lat-Binary2Decimal) | LAT |
 | 5  | Page Flip Starter                    | Flutter UI Challenge | [Link](https://github.com/Mjajang/Explore-Flutter/tree/master/lat_page_flip_starter) | LAT |
 | 4  | Pushable Button Starter              | Flutter UI Challenge | [Link](https://github.com/Mjajang/Explore-Flutter/tree/master/lat_pushable_button_starter) | LAT |
